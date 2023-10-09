@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers\Auth;
 
-use Rules\Password;
+use Illuminate\Support\Facades\Password;
+
 use App\Models\User;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
@@ -50,28 +51,19 @@ class RegisteredUserController extends Controller
         return redirect(RouteServiceProvider::HOME);
     }
     public function registerApi(Request $request)
-{
-    $request->validate([
-        'name' => ['required', 'string', 'max:255'],
-        'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
-        'password' => ['required', 'confirmed', Password::defaults()],
-    ]);
+    {
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
 
+        $user = User::create([
+            'name' => $request->input('name'),
+            'email' => $request->input('email'),
+            'password' => Hash::make($request->input('password')),
+        ]);
 
-    if ($validator->fails()) {
-        return response()->json(['errors' => $validator->errors()], 422);
+        return response()->json(['message' => 'Utilisateur enregistré avec succès'], 201);
     }
-
-    // Créez le nouvel utilisateur
-    $user = User::create([
-        'name' => $request->input('name'),
-        'email' => $request->input('email'),
-        'password' => Hash::make($request->input('password')),
-    ]);
-
-    // Vous pouvez également générer un token d'accès ici si nécessaire
-
-    return response()->json(['message' => 'Utilisateur enregistré avec succès'], 201);
-}
-
 }
