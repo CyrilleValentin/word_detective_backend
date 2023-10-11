@@ -95,5 +95,20 @@ class UserController extends Controller
         ], 500);
     }
 }
+public function logout(Request $request){
+    $accessToken=$request->bearerToken();
+    $token=PersonalAccessToken::findToken($accessToken);   
+    $token->delete(); 
+    return response()->json([
+        'statut' => 'true',
+        'message' => 'Déconnecté avec succès']);  
+}
+public function profile(Request $request){
+    return response()->json([
+        'statut' => 'true',
+        'message' => 'Profil de l\'utilisateur',
+        'data'=> $request->user()
+    ]);  
+}
 
 }
