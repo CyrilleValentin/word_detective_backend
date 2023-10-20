@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Laravel\Sanctum\PersonalAccessToken;
 use Illuminate\Support\Facades\Validator;
 
 
@@ -52,7 +53,6 @@ class UserController extends Controller
          }
      }  
 
-
     /**
      * login User
      * @param Request request
@@ -95,6 +95,7 @@ class UserController extends Controller
         ], 500);
     }
 }
+
 public function logout(Request $request){
     $accessToken=$request->bearerToken();
     $token=PersonalAccessToken::findToken($accessToken);   
@@ -103,12 +104,37 @@ public function logout(Request $request){
         'statut' => 'true',
         'message' => 'Déconnecté avec succès']);  
 }
+
 public function profile(Request $request){
     return response()->json([
         'statut' => 'true',
         'message' => 'Profil de l\'utilisateur',
         'data'=> $request->user()
     ]);  
+}
+
+public function updateScore(Request $request)
+{
+    // Récupérez l'utilisateur à partir du token (similaire à votre fonction de déconnexion)
+    $accessToken = $request->bearerToken();
+    $user = PersonalAccessToken::findToken($accessToken)->tokenable;
+
+    if (!$user) {
+        return response()->json(['message' => 'Token invalide'], 401);
+    }
+
+    // Récupérez le nouveau score depuis la demande (par exemple, depuis un champ "score" dans la demande)
+    $newScore = $request->input('score');
+
+    // Mettez à jour le score de l'utilisateur
+    $user->score = $newScore;
+    $user->save();
+
+    return response()->json([
+        'statut' => 'true',
+        'message' => 'Score mis à jour avec succès',
+        'user' => $user
+    ]);
 }
 
 }

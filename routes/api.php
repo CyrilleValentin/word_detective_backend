@@ -24,4 +24,5 @@ Route::post('/auth/login',[UserController::class ,'loginUser']);
 Route::group(['middleware'=>['auth:sanctum']],function () {
     Route::get('/auth/profile',[UserController::class ,'profile']);
     Route::delete('/auth/logout',[UserController::class ,'logout']);
+    Route::post('/auth/update-score',[UserController::class ,'updateScore']);
 });
